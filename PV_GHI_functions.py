@@ -7,7 +7,7 @@ from groundwater_database import get_coordinates
 ## And to only keep the 50 best to then go get capacity factors for those locations from Ninja Renewables API
 
 def make_url():
-    nrel_api_key = 'nrE78X1ApOcYUea52exv7CuxpvpAXkKHdebJZwal'
+    #nrel_api_key = ''
     url = 'https://developer.nrel.gov/api/nsrdb/v2/solar/himawari7-download.json?api_key=%s' % (nrel_api_key)
     return url
 
