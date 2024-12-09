@@ -1,6 +1,8 @@
 # TBTE-Final-Project
 Contains all the work done for the final project in my python data analytics class.
 Below are brief descriptions of each script.
+The plan is to create a model that optimizes each well location based on well depth & quality, GHI, tree water demand, and CO2 stored/sequestered.
+Ultimaltey finding which locations are best energy-wise and what species are best for an afforestation project of 1 acre (550 trees) on solar-desalinated brackish-groundwater.
 
 **groundwater_mapV1.py**
 This is the first script I created, mostly data cleaning, irrelevant.
