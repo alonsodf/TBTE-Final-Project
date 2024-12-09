@@ -24,5 +24,5 @@ Tried to implement a time.sleep loop but cannot get it to work.  Also they have 
 Takes in data from two sources: WUCOLS and Urban Tree Database.
 WUCOLS contains a water-demand factor for multiple tree species that is multipled by a regional value to estimate water demand per (week/month/year).
 Urban Tree Database has growth (allometric) equations and carbon sequestration equations for multiple tree species.
-Clean data to get trees that are good in Texas and have data in both datasets.
+Clean data to get trees that are good in Texas and have data in both sources
 
