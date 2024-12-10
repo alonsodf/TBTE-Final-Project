@@ -92,8 +92,20 @@ tree_regional_data['ETO'] = tree_regional_data['Region 1 Water Use'].map(water_u
 
 ### Bring in monthly avg ETO data for different cities in Texas
 monthly_avg_ETO = pd.read_excel(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Avg_monthly_ETO.xlsx")
-
+monthly_avg_ETO.at[3, 'City'] = 'Brownsville'
 
 ### Read Tx city data
 tx_cities = gpd.read_file(r'C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Texas_Cities_1604860330021197414.geojson')
 tx_cities_df = pd.DataFrame(tx_cities)
+
+### Get the cities that are in the monthly_avg_ETO data
+eto_city_names = monthly_avg_ETO['City'].tolist()
+tx_city_names = tx_cities.loc[tx_cities['CITY_NM'].isin(eto_city_names), 'CITY_NM'].tolist()
+
+tx_cities_filtered = tx_cities.loc[tx_cities['CITY_NM'].isin(tx_city_names)]
+tx_cities_filtered = tx_cities_filtered[['CITY_NM', 'geometry']]
+tx_cities_filtered_df = pd.DataFrame(tx_cities_filtered)
+
+### Pull lat and lon coordinates
+tx_cities_lon = tx_cities_filtered.geometry.x
+tx_cities_lat = tx_cities_filtered.geometry.y
