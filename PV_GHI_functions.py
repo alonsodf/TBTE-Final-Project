@@ -5,6 +5,8 @@ import pandas as pd
 ## Want to write a script that optimizes the TDS level, well depth, and GHI
 ## And to only keepy the 50 best to then go get capacity factors for those locations from Ninja Renewables API
 
+coordinates = pd.read_excel(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\well_coordinates.xlsx")
+
 def make_url():
     nrel_api_key = ''
     url = 'https://developer.nrel.gov/api/nsrdb/v2/solar/himawari7-download.json?api_key=%s' % (nrel_api_key)
@@ -39,8 +41,7 @@ def get_response(url, payload):
     
 def main():
     # Get the coordinates dataframe from groundwater_database
-    coordinates = pd.read_excel(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\well_coordinates.xlsx")
-
+    
     # Make the URL
     url = make_url()
     print(f"URL: {url}")
