@@ -5,8 +5,8 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import contextily as ctx
-import requests
-import time
+import requests, time
+import shapely.geometry import Point
 
 # This is using well depth and geospatial data from https://waterdatafortexas.org/groundwater
 # And TDS data from  http://www.twdb.texas.gov/groundwater/data/gwdbrpt.asp
@@ -61,11 +61,12 @@ merge_left = merge_left.drop(['StateWellNumber', 'County', 'SampleYear'], axis=1
 
 ## Convert to geodataframes
 wells_geo_with_TDS = gpd.GeoDataFrame(merge_inner2)
+wells_geo_with_TDS = wells_geo_with_TDS.drop(['StateWellNumber'], axis=1)
 wells_all_geo = gpd.GeoDataFrame(merge_left)
 
 
 # Get Texas GIS data
-us_counties = gpd.read_file('US_COUNTY_SHPFILE/US_county_cont.shp')
+us_counties = gpd.read_file(r'c:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\US_COUNTY_SHPFILE\US_county_cont.shp')
 tx_county = us_counties[us_counties['STATE_NAME'] == 'Texas']
 tx = tx_county.dissolve(by='STATE_NAME', aggfunc='sum')
 
@@ -104,7 +105,7 @@ ax1.legend(sorted_handles1, sorted_labels1, title="Well Depth", title_fontsize='
 
 # Display the plot
 plt.axis('off')
-plt.show()
+#plt.show()
 
 #%%
 ### Plotting ###
@@ -135,14 +136,26 @@ ax.legend(sorted_handles2, sorted_labels2, title="TDS Levels", title_fontsize='x
 
 # Display the plot
 plt.axis('off')
-plt.show()
+#plt.show()
 
 # %%
 ### Getting coordinates ###
-lat = wells_geo_with_TDS.geometry.x
-lon = wells_geo_with_TDS.geometry.y
-lat = list(lat)
-lon = list(lon)
+tx_city_coords = gpd.read_file(r'c:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\tx_cities_filtered.geojson')
 
-def get_coordinates(lat, lon):
-    return lat, lon
+## Matching wells with cities to pair with monthly ETo data
+wells_geo_with_TDS = wells_geo_with_TDS.to_crs("EPSG:3857")
+tx_city_coords = tx_city_coords.to_crs("EPSG:3857")
+
+wells_with_nearest_city = gpd.sjoin_nearest(wells_geo_with_TDS, tx_city_coords, how="left", distance_col="distance")
+df_wells_with_nearest_city = pd.DataFrame(wells_with_nearest_city)
+
+wells_geo_with_TDS['nearest_city'] = wells_with_nearest_city['CITY_NM']
+wells_geo_with_TDS['distance'] = wells_with_nearest_city['distance'] * 0.000621371  # Convert meters to miles
+
+df_wells_GIS = pd.DataFrame(wells_geo_with_TDS)
+
+
+#lat = wells_geo_with_TDS.geometry.x
+#lon = wells_geo_with_TDS.geometry.y
+#lat = list(lat)
+#lon = list(lon)
