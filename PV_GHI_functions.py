@@ -7,7 +7,7 @@ from groundwater_database import get_coordinates
 ## And to only keep the 50 best to then go get capacity factors for those locations from Ninja Renewables API
 
 def make_url():
-    #nrel_api_key = ''
+    nrel_api_key = ''
     url = 'https://developer.nrel.gov/api/nsrdb/v2/solar/himawari7-download.json?api_key=%s' % (nrel_api_key)
     return url
 
@@ -37,3 +37,29 @@ def get_response(url, payload):
     except requests.exceptions.RequestException as e:
         print(f"Error making POST request: {e}")
         return None
+    
+def main():
+    # Get the coordinates dataframe from groundwater_database
+    coordinates_df = get_coordinates()
+
+    # Make the URL
+    url = make_url()
+
+    # Check if the URL is good
+    if check_url(url) == 'bad':
+        print("URL is not accessible.")
+        return
+
+    for index, row in coordinates_df.iterrows():
+        lat = row['latitude']
+        lon = row['longitude']
+
+        payload = get_payload(lat, lon)
+
+        response = get_response(url, payload)
+
+        if response:
+            pass
+
+if __name__ == "__main__":
+    main()
