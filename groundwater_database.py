@@ -65,7 +65,7 @@ wells_all_geo = gpd.GeoDataFrame(merge_left)
 
 
 # Get Texas GIS data
-us_counties = gpd.read_file('US_COUNTY_SHPFILE/US_county_cont.shp')
+us_counties = gpd.read_file(r'C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\US_COUNTY_SHPFILE\US_county_cont.shp')
 tx_county = us_counties[us_counties['STATE_NAME'] == 'Texas']
 tx = tx_county.dissolve(by='STATE_NAME', aggfunc='sum')
 
@@ -104,7 +104,7 @@ ax1.legend(sorted_handles1, sorted_labels1, title="Well Depth", title_fontsize='
 
 # Display the plot
 plt.axis('off')
-plt.show()
+#plt.show()
 
 #%%
 ### Plotting ###
@@ -135,7 +135,7 @@ ax.legend(sorted_handles2, sorted_labels2, title="TDS Levels", title_fontsize='x
 
 # Display the plot
 plt.axis('off')
-plt.show()
+#plt.show()
 
 # %%
 ### Getting coordinates ###
@@ -143,6 +143,8 @@ lat = wells_geo_with_TDS.geometry.x
 lon = wells_geo_with_TDS.geometry.y
 lat = list(lat)
 lon = list(lon)
+well_coordinates = {'latitude': lat, 'longitude': lon}
+well_coordinates = pd.DataFrame(well_coordinates)
 
-def get_coordinates(lat, lon):
-    return lat, lon
+# Output the dataframe to an Excel file
+well_coordinates.to_excel('well_coordinates.xlsx', index=False)
