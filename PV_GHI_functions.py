@@ -1,10 +1,10 @@
-import sys, json, requests, time
+import sys, json, time
 from urllib.request import urlopen
 from groundwater_database import get_coordinates
 
 ## Using NREL API to get GHI data for all well locations
 ## Want to write a script that optimizes the TDS level, well depth, and GHI
-## And to only keep the 50 best to then go get capacity factors for those locations from Ninja Renewables API
+## And to only keepy the 50 best to then go get capacity factors for those locations from Ninja Renewables API
 
 def make_url():
     nrel_api_key = ''
