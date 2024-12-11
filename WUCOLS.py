@@ -135,7 +135,7 @@ def calculate_water_demand(monthly_avg_ETO, tree_regional_data, well_GIS_df, tot
                 'Nearest_City': nearest_city,
                 "Distance": round(well['distance']),
                 'Species': tree['Botanical Name'],
-                'Monthy_Demand': monthly_demand.to_dict()
+                'Monthly_Demand': monthly_demand.to_dict()
             }
             water_demand_results.append(monthly_demand_results)
     
@@ -144,3 +144,43 @@ def calculate_water_demand(monthly_avg_ETO, tree_regional_data, well_GIS_df, tot
 
 water_demand_results_df = calculate_water_demand(monthly_avg_ETO, tree_regional_data, well_GIS_df, total_trees)
 
+
+#%%
+### Convert to daily consumption m^3/day ###
+def convert_acre_ft_to_m3_per_day(water_demand_results_df):
+    # Conversion factor
+    acre_ft_to_m3 = 1233.48
+    
+    # Initialize an empty list to store the results
+    results = []
+
+    # Loop through each row in the water_demand_results_df
+    for _, row in water_demand_results_df.iterrows():
+        monthly_demand = row['Monthly_Demand']
+        monthly_demand_m3_per_day = {}
+        
+        # Loop through each month and convert the demand
+        for month, demand_acre_ft in monthly_demand.items():
+            days_in_month = pd.Period(month, freq='M').days_in_month
+            demand_m3_per_day = (demand_acre_ft * acre_ft_to_m3) / days_in_month
+            monthly_demand_m3_per_day[month] = demand_m3_per_day
+        
+        # Store the result
+        result = {
+            'Well_ID': row['Well_ID'],
+            'Tree_Species': row['Species'],
+            'Nearest_City': row['Nearest_City'],
+            'Distance': row['Distance'],
+            'Daily_Demand_Per_Month': monthly_demand_m3_per_day
+        }
+        results.append(result)
+    
+    # Convert the results to a dataframe
+    results_df = pd.DataFrame(results)
+    return results_df
+
+# Example usage
+# Assuming water_demand_results_df is already created
+water_demand_m3_per_day_df = convert_acre_ft_to_m3_per_day(water_demand_results_df)
+
+# %%
