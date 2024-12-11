@@ -106,6 +106,41 @@ tx_cities_filtered = tx_cities.loc[tx_cities['CITY_NM'].isin(tx_city_names)]
 tx_cities_filtered = tx_cities_filtered[['CITY_NM', 'geometry']]
 tx_cities_filtered_df = pd.DataFrame(tx_cities_filtered)
 
-### Pull lat and lon coordinates
-tx_cities_lon = tx_cities_filtered.geometry.x
-tx_cities_lat = tx_cities_filtered.geometry.y
+### Read in well data
+well_GIS = gpd.read_file(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\well_GIS.geojson")
+well_GIS_df = pd.DataFrame(well_GIS)
+
+#%%
+### Calculating water demand for each tree at each well ###
+### Apply water_demand for a 1 acre plot, 550 trees ###
+num_trees_per_acre = 550
+acres = 1
+total_trees = num_trees_per_acre * acres
+def calculate_water_demand(monthly_avg_ETO, tree_regional_data, well_GIS_df, total_trees):
+    water_demand_results = []
+
+    for _, well in well_GIS_df.iterrows():
+        nearest_city = well['nearest_city']
+        city_eto = monthly_avg_ETO[monthly_avg_ETO['City'] == nearest_city].iloc[0, 1:] # Get the ETO data for the city
+
+        for _, tree in tree_regional_data.iterrows():
+            tree_species = ['Botanical Name']
+            tree_factor = tree['ETO']
+
+            monthly_demand = city_eto * tree_factor * total_trees * (1/12) # Monthly demand in acre-feet
+            monthly_demand = monthly_demand.round()
+
+            monthly_demand_results = {
+                'Well_ID': well['state_well_number'],
+                'Nearest_City': nearest_city,
+                "Distance": round(well['distance']),
+                'Species': tree['Botanical Name'],
+                'Monthy_Demand': monthly_demand.to_dict()
+            }
+            water_demand_results.append(monthly_demand_results)
+    
+    water_demand_results_df = pd.DataFrame(water_demand_results)
+    return water_demand_results_df
+
+water_demand_results_df = calculate_water_demand(monthly_avg_ETO, tree_regional_data, well_GIS_df, total_trees)
+
