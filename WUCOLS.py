@@ -5,8 +5,7 @@ import numpy as np
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 import math
-from PySAM import Pvwatts8
-
+import PySAM.Pvwattsv8 as Pvwattsv8
 
 ### Read-in Data ###
 water_data = pd.read_excel(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Tree\Data\WUCOLS_all_regions.xlsx")
@@ -203,7 +202,14 @@ def weather_file_match(nearest_city, monthly_kW_demand):
     model.SystemDesign.system_capacity = 1 # kw
     model.SolarResource.solar_resource_file = os.path.join('Weather', f'{nearest_city}.epw')
     model.execute()
-    #model.Outputs.
+    model.Outputs.ac_monthly
+    model.Outputs.monthly_energy
+    model.Outputs.ac_annual
+    model.Outputs.gen
+    model.Outputs.capacity_factor
+    model.Outputs.gh
+    model.Outputs.solrad_monthly
+    
 
 
 for (well_id, species), wdata in energy_schedule.groupby(['Well_ID', 'Tree_Species']):
