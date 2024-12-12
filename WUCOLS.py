@@ -3,6 +3,7 @@ import geopandas as gpd
 import numpy as np
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
+import math
 
 
 ### Read-in Data ###
@@ -184,3 +185,78 @@ def convert_acre_ft_to_m3_per_day(water_demand_results_df):
 water_demand_m3_per_day_df = convert_acre_ft_to_m3_per_day(water_demand_results_df)
 
 # %%
+### Merge tree data with energy schedule data ###
+energy_schedule = pd.read_csv(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\energy_schedule.csv")
+energy_schedule = energy_schedule.drop(columns=['Unnamed: 0'])
+
+# Filter tree data to only include trees in the energy schedule
+tree_data = tree_data[tree_data['Scientific Name'].isin(energy_schedule['Tree_Species'])]
+energy_schedule = energy_schedule[energy_schedule['Tree_Species'].isin(tree_data['Scientific Name'])]
+
+# %%
+### Generate growth equations for each tree ###
+
+mse = #Sigma column ^2
+
+def loglogw1_dbh(a, b, age, mse):
+    return math.exp(a + b * math.log(math.log(age) + (mse / 2)))
+
+def loglogw1_age(a, b, dbh, mse):
+    return math.exp(a + b * math.log(math.log(dbh + 1) + (mse / 2)))
+
+def loglogw2_dbh(a, b, age, mse):
+    return math.exp(a + b * math.log(math.log(age)) + (math.sqrt(age) * (mse / 2)))
+
+def loglogw2_age(a, b, dbh, mse):
+    return math.exp(a + b * math.log(math.log(dbh + 1)) + (math.sqrt(dbh) * (mse / 2)))
+
+def loglogw3_dbh(a, b, age, mse):
+    return math.exp(a + b * math.log(math.log(age)) + age + (mse / 2))
+
+def loglogw3_age(a, b, dbh, mse):
+    return math.exp(a + b * math.log(math.log(dbh + 1)) + dbh + (mse / 2))
+
+def loglogw4_dbh(a, b, age, mse):
+    return math.exp(a + b * math.log(math.log(age)) + (age**2) + (mse / 2))
+
+def loglogw4(a, b, dbh, mse):
+    return math.exp(a + b * math.log(math.log(dbh + 1)) + (dbh**2) + (mse / 2))
+
+def lin_dbh(a, b, age):
+    return a + b * age
+
+def lin_age(a, b, dbh):
+    return a + b * dbh
+
+def quad(a, b, c, x):
+    return a + b * x + c * (x**2)
+
+def cub(a, b, c, d, x):
+    return a + b * x + c * (x**2) + d * (x**3)
+
+def quart(a, b, c, d, e, x):
+    return a + b * x + c * (x**2) + d * (x**3) + e * (x**4)
+
+def expow1_dbh(a, b, age, mse):
+    return math.exp(a + b * age + (mse / 2))
+
+def expow1_age(a, b, dbh, mse):
+    return math.exp(a + b * dbh + (mse / 2))
+
+def expow2_dbh(a, b, age, mse):
+    return math.exp(a + b * age + math.sqrt(age) + (mse / 2))
+
+def expow2_age(a, b, dbh, mse):
+    return math.exp(a + b * dbh + math.sqrt(dbh) + (mse / 2))
+
+def expow3_dbh(a, b, age, mse):
+    return math.exp(a + b * age + age + (mse / 2))
+
+def expow3_age(a, b, dbh, mse):
+    return math.exp(a + b * dbh + dbh + (mse / 2))
+
+def expow4_dbh(a, b, age, mse):
+    return math.exp(a + b * age + (age**2) + (mse / 2))
+
+def expow4_age(a, b, dbh, mse):
+    return math.exp(a + b * dbh + (dbh**2) + (mse / 2))
