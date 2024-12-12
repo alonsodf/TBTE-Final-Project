@@ -124,9 +124,6 @@ power_df = pd.DataFrame(power_results)
 
 # %%
 ### Extract flow rates from dictonary ###
-water_demand['Daily_Demand_Per_Month'] = water_demand['Daily_Demand_Per_Month'].apply(ast.literal_eval)
-water_demand['Flow_Rate_m3_per_s'] = water_demand['Flow_Rate_m3_per_s'].apply(ast.literal_eval)
-
 # Expand the dictionaries into rows
 rows = []
 for index, row in water_demand.iterrows():
