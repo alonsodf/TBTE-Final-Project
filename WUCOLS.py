@@ -1,9 +1,11 @@
+import os
 import pandas as pd
 import geopandas as gpd
 import numpy as np
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 import math
+from PySAM import Pvwatts8
 
 
 ### Read-in Data ###
@@ -192,6 +194,23 @@ energy_schedule = energy_schedule.drop(columns=['Unnamed: 0'])
 # Filter tree data to only include trees in the energy schedule
 tree_data = tree_data[tree_data['Scientific Name'].isin(energy_schedule['Tree_Species'])]
 energy_schedule = energy_schedule[energy_schedule['Tree_Species'].isin(tree_data['Scientific Name'])]
+
+
+#%%
+
+def weather_file_match(nearest_city, monthly_kW_demand):
+    model = Pvwattsv8.default('PVWattsNone')
+    model.SystemDesign.system_capacity = 1 # kw
+    model.SolarResource.solar_resource_file = os.path.join('Weather', f'{nearest_city}.epw')
+    model.execute()
+    #model.Outputs.
+
+
+for (well_id, species), wdata in energy_schedule.groupby(['Well_ID', 'Tree_Species']):
+    nearest_city = well_GIS_df[well_GIS_df['state_well_number']==str(well_id)]['nearest_city'].iloc[0]
+    monthly_kW_demand = wdata['Total_Power_kW'].tolist()
+    weather_file_match(nearest_city, monthly_kW_demand)
+
 
 # %%
 ### Generate growth equations for each tree ###

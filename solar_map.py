@@ -1,5 +1,5 @@
+from datetime import datetime
 import requests, json, time
-from groundwater_database import get_coordinates
 import pandas as pd
 
 
@@ -29,18 +29,19 @@ for i, ii in zip(lat, lon):
         'azim': 180,
         'format': 'json'
     }
+    print('start:', datetime.now())
+    # r = s.get(url, params=args)
 
-    r = s.get(url, params=args)
-
-    # Check if the response was successful
-    if r.status_code == 200:
-        try:
-            parsed_response = json.loads(r.text)
-            data = pd.read_json(json.dumps(parsed_response['data']), orient='index')
-            output_data.append(data)
-        except json.JSONDecodeError:
-            print("JSON decoding failed. Response text:", r.text)
-    else:
-        print(f"Request failed with status code {r.status_code}. Response text:", r.text)
+    # # Check if the response was successful
+    # if r.status_code == 200:
+    #     try:
+    #         parsed_response = json.loads(r.text)
+    #         data = pd.read_json(json.dumps(parsed_response['data']), orient='index')
+    #         output_data.append(data)
+    #     except json.JSONDecodeError:
+    #         print("JSON decoding failed. Response text:", r.text)
+    # else:
+    #     print(f"Request failed with status code {r.status_code}. Response text:", r.text)
 
     time.sleep(75)  # Sleep for 75 seconds
+    print('end:', datetime.now())
