@@ -202,20 +202,28 @@ def weather_file_match(nearest_city, monthly_kW_demand):
     model.SystemDesign.system_capacity = 1 # kw
     model.SolarResource.solar_resource_file = os.path.join('Weather', f'{nearest_city}.epw')
     model.execute()
-    model.Outputs.ac_monthly
-    model.Outputs.monthly_energy
-    model.Outputs.ac_annual
-    model.Outputs.gen
-    model.Outputs.capacity_factor
-    model.Outputs.gh
-    model.Outputs.solrad_monthly
-    
+    return {
+    'ac_monthly': model.Outputs.ac_monthly,
+    'ac_annual': model.Outputs.ac_annual,
+    'capacity_factor': model.Outputs.capacity_factor,
+    'gh': model.Outputs.gh,
+    'solrad_monthly': model.Outputs.solrad_monthly,
+    'gen': model.Outputs.gen,
+    }
 
-
+PV_results = []
 for (well_id, species), wdata in energy_schedule.groupby(['Well_ID', 'Tree_Species']):
     nearest_city = well_GIS_df[well_GIS_df['state_well_number']==str(well_id)]['nearest_city'].iloc[0]
     monthly_kW_demand = wdata['Total_Power_kW'].tolist()
-    weather_file_match(nearest_city, monthly_kW_demand)
+    results = weather_file_match(nearest_city, monthly_kW_demand)
+    PV_results.append({
+        'well_id': well_id,
+        'species': species,
+        'result': results
+    })
+
+
+print('moving on now')
 
 
 # %%
@@ -285,3 +293,21 @@ def expow4_dbh(a, b, age, mse):
 
 def expow4_age(a, b, dbh, mse):
     return math.exp(a + b * dbh + (dbh**2) + (mse / 2))
+
+# #%%
+# growth_rates = []
+
+# for index, row in tree_data.iterrows():
+#     if row['Predicts component'] == 'dbh':
+#         a = row['a']
+#         b = row['b']
+#         c = row['c']
+#         d = row['d']
+#         for age in range(20, 41):  # From age 20 to 40 inclusive
+#             dbh = quad(a, b, c, d, age)
+#             growth_rates.append({
+#                 'tree_id': row['tree_id'],  # Assuming 'tree_id' is a column in tree_data
+#                 'age': age,
+#                 'dbh': dbh
+#             })
+# # %%
