@@ -198,25 +198,42 @@ energy_schedule = energy_schedule[energy_schedule['Tree_Species'].isin(tree_data
 #%%
 
 def weather_file_match(nearest_city, monthly_kW_demand):
-    model = Pvwattsv8.default('PVWattsNone')
-    model.SystemDesign.system_capacity = 1 # kw
-    model.SolarResource.solar_resource_file = os.path.join('Weather', f'{nearest_city}.epw')
-    model.execute()
-    model.Outputs.ac_monthly
-    model.Outputs.monthly_energy
-    model.Outputs.ac_annual
-    model.Outputs.gen
-    model.Outputs.capacity_factor
-    model.Outputs.gh
-    model.Outputs.solrad_monthly
+    try:
+        model = Pvwattsv8.default('PVWattsNone')
+        model.SystemDesign.system_capacity = 1 # kw
+        
+        weather_file_path = os.path.join('Weather', f'{nearest_city}.epw')
+        if not os.path.exists(weather_file_path):
+            raise FileNotFoundError(f'Weather file not found for {nearest_city}')
+        model.SolarResource.solar_resource_file = weather_file_path
+
+        model.execute()
+        
+        # Extract results (example)
+        print(f"AC Monthly: {model.Outputs.ac_monthly}")
+        print(f"AC Annual: {model.Outputs.ac_annual}")
+        print(f"Capacity Factor: {model.Outputs.capacity_factor}")
+        model.Outputs.ac_monthly
+        model.Outputs.monthly_energy
+        model.Outputs.ac_annual
+        model.Outputs.gen
+        model.Outputs.capacity_factor
+        model.Outputs.gh
+        model.Outputs.solrad_monthly
+
+    except Exception as e:
+        print(f"Error processing {nearest_city}: {e}")
+
+        
     
 
 
 for (well_id, species), wdata in energy_schedule.groupby(['Well_ID', 'Tree_Species']):
     nearest_city = well_GIS_df[well_GIS_df['state_well_number']==str(well_id)]['nearest_city'].iloc[0]
     monthly_kW_demand = wdata['Total_Power_kW'].tolist()
-    weather_file_match(nearest_city, monthly_kW_demand)
 
+    print(f"Processing Well ID {well_id}, Tree Species {species}, Nearest City {nearest_city}")
+    weather_file_match(nearest_city, monthly_kW_demand)
 
 # %%
 ### Generate growth equations for each tree ###
