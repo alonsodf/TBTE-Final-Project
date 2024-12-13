@@ -208,7 +208,7 @@ def weather_file_match(nearest_city, monthly_kW_demand):
     'capacity_factor': model.Outputs.capacity_factor,
     'gh': model.Outputs.gh,
     'solrad_monthly': model.Outputs.solrad_monthly,
-    'gen': model.Outputs.gen,
+    'gen': model.Outputs.gen
     }
 
 PV_results = []
