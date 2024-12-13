@@ -78,14 +78,6 @@ RO_coefficient = 1000  # N*L/m^2 mg
 TDS_out = 500  # mg/L
 operational_hours_per_day = 8
 
-# Function to calculate flow rate for each month
-def calculate_flow_rate(daily_demand_dict):
-    flow_rate_dict = {}
-    for month, daily_demand in daily_demand_dict.items():
-        flow_rate = daily_demand / (operational_hours_per_day * 3600)
-        flow_rate_dict[month] = flow_rate
-    return flow_rate_dict
-
 # Function to calculate pumping power
 def pumping_power(pump_efficiency, specific_weight, well_depth, flow_rate):
     return (specific_weight * well_depth * flow_rate) / pump_efficiency  # Watts
