@@ -2,8 +2,8 @@ import pandas as pd
 import geopandas as gpd
 import ast
 
-water_demand = pd.read_csv(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\water_demand_daily.csv")
-well_GIS = gpd.read_file(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\well_GIS.geojson")
+water_demand = pd.read_csv(r"03 Data\water_demand_daily.csv")
+well_GIS = gpd.read_file(r"03 Data\well_GIS.geojson")
 well_GIS_df = pd.DataFrame(well_GIS)
 well_GIS_df = well_GIS_df[well_GIS_df['ParameterValue'] >= 500]
 

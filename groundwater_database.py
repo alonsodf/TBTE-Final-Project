@@ -13,12 +13,12 @@ import shapely.geometry import Point
 
 #%%
 ### READ IN DATA ###
-well_depths = pd.read_csv('C:/Users/Alonso/OneDrive - The University of Texas at Austin/UT/Research/03 Data/recent-conditions.csv')
-well_metadata = gpd.read_file('C:/Users/Alonso/OneDrive - The University of Texas at Austin/UT/Research/03 Data/well-metadata.geojson')
+well_depths = pd.read_csv('03 Data/recent-conditions.csv')
+well_metadata = gpd.read_file('03 Data/well-metadata.geojson')
 
-major_data = pd.read_csv('C:/Users/Alonso/OneDrive - The University of Texas at Austin/UT/Research/03 Data/GWDBDownload/WaterQualityMajor.txt', sep='|', low_memory=False)
-minor_data = pd.read_csv('C:/Users/Alonso/OneDrive - The University of Texas at Austin/UT/Research/03 Data/GWDBDownload/WaterQualityMinor.txt', sep='|', low_memory=False)
-combination_data = pd.read_csv('C:/Users/Alonso/OneDrive - The University of Texas at Austin/UT/Research/03 Data/GWDBDownload/WaterQualityCombination.txt', sep='|', low_memory=False)
+major_data = pd.read_csv('03 Data/GWDBDownload/WaterQualityMajor.txt', sep='|', low_memory=False)
+minor_data = pd.read_csv('03 Data/GWDBDownload/WaterQualityMinor.txt', sep='|', low_memory=False)
+combination_data = pd.read_csv('03 Data/GWDBDownload/WaterQualityCombination.txt', sep='|', low_memory=False)
 
 #%%
 ### WORK FLOW ###

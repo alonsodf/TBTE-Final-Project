@@ -8,8 +8,8 @@ import math
 import PySAM.Pvwattsv8 as Pvwattsv8
 
 ### Read-in Data ###
-water_data = pd.read_excel(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Tree\Data\WUCOLS_all_regions.xlsx")
-tree_data = pd.read_csv(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Tree\Data\TS6_Growth_coefficients.csv")
+water_data = pd.read_excel(r"03 Data\Tree\Data\WUCOLS_all_regions.xlsx")
+tree_data = pd.read_csv(r"03 Data\Tree\Data\TS6_Growth_coefficients.csv")
 
 ### Filter tree_data to regions specific to texas ###
 regions = ['GulfCo', 'Piedmt', 'InterW']
@@ -72,7 +72,7 @@ tx_trees = tx_trees[~tx_trees.isin(for_sure_not_trees)]
 tx_trees = tx_trees[~tx_trees.isin(list_of_maybe_trees)]
 
 ### Growth equations and coefficients
-growth_eqs = pd.read_csv(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Tree\Data\TS4_Growth_eqn_forms.csv")
+growth_eqs = pd.read_csv(r"03 Data\Tree\Data\TS4_Growth_eqn_forms.csv")
 tx_tree_data = tree_data[tree_data['Scientific Name'].isin(tx_trees)]
 
 ### Water demand data
@@ -93,11 +93,11 @@ tree_regional_data['ETO'] = tree_regional_data['Region 1 Water Use'].map(water_u
 
 
 ### Bring in monthly avg ETO data for different cities in Texas
-monthly_avg_ETO = pd.read_excel(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Avg_monthly_ETO.xlsx")
+monthly_avg_ETO = pd.read_excel(r"03 Data\Avg_monthly_ETO.xlsx")
 monthly_avg_ETO.at[3, 'City'] = 'Brownsville'
 
 ### Read Tx city data
-tx_cities = gpd.read_file(r'C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Texas_Cities_1604860330021197414.geojson')
+tx_cities = gpd.read_file(r'03 Data\Texas_Cities_1604860330021197414.geojson')
 tx_cities_df = pd.DataFrame(tx_cities)
 
 ### Get the cities that are in the monthly_avg_ETO data
@@ -109,7 +109,7 @@ tx_cities_filtered = tx_cities_filtered[['CITY_NM', 'geometry']]
 tx_cities_filtered_df = pd.DataFrame(tx_cities_filtered)
 
 ### Read in well data
-well_GIS = gpd.read_file(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\well_GIS.geojson")
+well_GIS = gpd.read_file(r"03 Data\well_GIS.geojson")
 well_GIS_df = pd.DataFrame(well_GIS)
 
 #%%
@@ -187,7 +187,7 @@ water_demand_m3_per_day_df = convert_acre_ft_to_m3_per_day(water_demand_results_
 
 # %%
 ### Merge tree data with energy schedule data ###
-energy_schedule = pd.read_csv(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\energy_schedule.csv")
+energy_schedule = pd.read_csv(r"03 Data\energy_schedule.csv")
 energy_schedule = energy_schedule.drop(columns=['Unnamed: 0'])
 
 # Filter tree data to only include trees in the energy schedule
