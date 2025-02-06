@@ -7,14 +7,18 @@ from fuzzywuzzy import process
 import math
 import PySAM.Pvwattsv8 as Pvwattsv8
 
+
+#%%
 ### Read-in Data ###
 water_data = pd.read_excel(r"03 Data\Tree\Data\WUCOLS_all_regions.xlsx")
 tree_data = pd.read_csv(r"03 Data\Tree\Data\TS6_Growth_coefficients.csv")
 
+#%%
 ### Filter tree_data to regions specific to texas ###
 regions = ['GulfCo', 'Piedmt', 'InterW']
 tree_data = tree_data[tree_data['Column1'].isin(regions)]
 
+#%%
 ### Fuzzy match tree_data to water_data ###
 tx_trees = tree_data['Scientific Name'].unique().tolist()
 tx_trees.sort(reverse=False) 
@@ -29,6 +33,7 @@ def fuzzy_filter(WUCOLS_trees, tx_trees, threshold=80):
         matched_names.extend([match[0] for match in matches if match[1] >= threshold])
     return list(matched_names)  # Return unique matched names
 
+#%%
 ### Find approximate matches
 matches = fuzzy_filter(WUCOLS_trees, tx_trees, threshold=90)
 matches = list(matches)
@@ -71,6 +76,7 @@ list_of_maybe_trees = [
 tx_trees = tx_trees[~tx_trees.isin(for_sure_not_trees)]
 tx_trees = tx_trees[~tx_trees.isin(list_of_maybe_trees)]
 
+#%%
 ### Growth equations and coefficients
 growth_eqs = pd.read_csv(r"03 Data\Tree\Data\TS4_Growth_eqn_forms.csv")
 tx_tree_data = tree_data[tree_data['Scientific Name'].isin(tx_trees)]
@@ -91,7 +97,7 @@ water_use_mapping = {
 }
 tree_regional_data['ETO'] = tree_regional_data['Region 1 Water Use'].map(water_use_mapping)
 
-
+#%%
 ### Bring in monthly avg ETO data for different cities in Texas
 monthly_avg_ETO = pd.read_excel(r"03 Data\Avg_monthly_ETO.xlsx")
 monthly_avg_ETO.at[3, 'City'] = 'Brownsville'
@@ -310,3 +316,5 @@ def expow4_age(a, b, dbh, mse):
 #                 'dbh': dbh
 #             })
 # # %%
+tx_cities = gpd.read_file(r'C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Texas_Cities_1604860330021197414.geojson')
+tx_cities_df = pd.DataFrame(tx_cities)

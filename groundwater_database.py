@@ -66,7 +66,7 @@ wells_all_geo = gpd.GeoDataFrame(merge_left)
 
 
 # Get Texas GIS data
-us_counties = gpd.read_file(r'c:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\US_COUNTY_SHPFILE\US_county_cont.shp')
+us_counties = gpd.read_file(r'C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\US_COUNTY_SHPFILE\US_county_cont.shp')
 tx_county = us_counties[us_counties['STATE_NAME'] == 'Texas']
 tx = tx_county.dissolve(by='STATE_NAME', aggfunc='sum')
 
@@ -140,22 +140,12 @@ plt.axis('off')
 
 # %%
 ### Getting coordinates ###
-tx_city_coords = gpd.read_file(r'c:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\tx_cities_filtered.geojson')
+lat = wells_geo_with_TDS.geometry.x
+lon = wells_geo_with_TDS.geometry.y
+lat = list(lat)
+lon = list(lon)
+well_coordinates = {'latitude': lat, 'longitude': lon}
+well_coordinates = pd.DataFrame(well_coordinates)
 
-## Matching wells with cities to pair with monthly ETo data
-wells_geo_with_TDS = wells_geo_with_TDS.to_crs("EPSG:3857")
-tx_city_coords = tx_city_coords.to_crs("EPSG:3857")
-
-wells_with_nearest_city = gpd.sjoin_nearest(wells_geo_with_TDS, tx_city_coords, how="left", distance_col="distance")
-df_wells_with_nearest_city = pd.DataFrame(wells_with_nearest_city)
-
-wells_geo_with_TDS['nearest_city'] = wells_with_nearest_city['CITY_NM']
-wells_geo_with_TDS['distance'] = wells_with_nearest_city['distance'] * 0.000621371  # Convert meters to miles
-
-df_wells_GIS = pd.DataFrame(wells_geo_with_TDS)
-
-
-#lat = wells_geo_with_TDS.geometry.x
-#lon = wells_geo_with_TDS.geometry.y
-#lat = list(lat)
-#lon = list(lon)
+# Output the dataframe to an Excel file
+well_coordinates.to_excel('well_coordinates.xlsx', index=False)

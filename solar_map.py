@@ -2,6 +2,10 @@ from datetime import datetime
 import requests, json, time
 import pandas as pd
 
+## Tried to run a sleep timer since Ninja API has a limit of 50 requests per minute
+## But it still didn't work, and they wont respond to my emails requesting a higher limit
+## 
+
 
 lat = list(lat)
 lon = list(lon)
