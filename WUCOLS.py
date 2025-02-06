@@ -8,8 +8,8 @@ import math
 import PySAM.Pvwattsv8 as Pvwattsv8
 
 ### Read-in Data ###
-water_data = pd.read_excel(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Tree\Data\WUCOLS_all_regions.xlsx")
-tree_data = pd.read_csv(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Tree\Data\TS6_Growth_coefficients.csv")
+water_data = pd.read_excel(r"03 Data\Tree\Data\WUCOLS_all_regions.xlsx")
+tree_data = pd.read_csv(r"03 Data\Tree\Data\TS6_Growth_coefficients.csv")
 
 ### Filter tree_data to regions specific to texas ###
 regions = ['GulfCo', 'Piedmt', 'InterW']
@@ -72,7 +72,7 @@ tx_trees = tx_trees[~tx_trees.isin(for_sure_not_trees)]
 tx_trees = tx_trees[~tx_trees.isin(list_of_maybe_trees)]
 
 ### Growth equations and coefficients
-growth_eqs = pd.read_csv(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Tree\Data\TS4_Growth_eqn_forms.csv")
+growth_eqs = pd.read_csv(r"03 Data\Tree\Data\TS4_Growth_eqn_forms.csv")
 tx_tree_data = tree_data[tree_data['Scientific Name'].isin(tx_trees)]
 
 ### Water demand data
@@ -93,11 +93,11 @@ tree_regional_data['ETO'] = tree_regional_data['Region 1 Water Use'].map(water_u
 
 
 ### Bring in monthly avg ETO data for different cities in Texas
-monthly_avg_ETO = pd.read_excel(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Avg_monthly_ETO.xlsx")
+monthly_avg_ETO = pd.read_excel(r"03 Data\Avg_monthly_ETO.xlsx")
 monthly_avg_ETO.at[3, 'City'] = 'Brownsville'
 
 ### Read Tx city data
-tx_cities = gpd.read_file(r'C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\Texas_Cities_1604860330021197414.geojson')
+tx_cities = gpd.read_file(r'03 Data\Texas_Cities_1604860330021197414.geojson')
 tx_cities_df = pd.DataFrame(tx_cities)
 
 ### Get the cities that are in the monthly_avg_ETO data
@@ -109,7 +109,7 @@ tx_cities_filtered = tx_cities_filtered[['CITY_NM', 'geometry']]
 tx_cities_filtered_df = pd.DataFrame(tx_cities_filtered)
 
 ### Read in well data
-well_GIS = gpd.read_file(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\well_GIS.geojson")
+well_GIS = gpd.read_file(r"03 Data\well_GIS.geojson")
 well_GIS_df = pd.DataFrame(well_GIS)
 
 #%%
@@ -187,7 +187,7 @@ water_demand_m3_per_day_df = convert_acre_ft_to_m3_per_day(water_demand_results_
 
 # %%
 ### Merge tree data with energy schedule data ###
-energy_schedule = pd.read_csv(r"C:\Users\Alonso\OneDrive - The University of Texas at Austin\UT\Research\03 Data\energy_schedule.csv")
+energy_schedule = pd.read_csv(r"03 Data\energy_schedule.csv")
 energy_schedule = energy_schedule.drop(columns=['Unnamed: 0'])
 
 # Filter tree data to only include trees in the energy schedule
@@ -198,42 +198,32 @@ energy_schedule = energy_schedule[energy_schedule['Tree_Species'].isin(tree_data
 #%%
 
 def weather_file_match(nearest_city, monthly_kW_demand):
-    try:
-        model = Pvwattsv8.default('PVWattsNone')
-        model.SystemDesign.system_capacity = 1 # kw
-        
-        weather_file_path = os.path.join('Weather', f'{nearest_city}.epw')
-        if not os.path.exists(weather_file_path):
-            raise FileNotFoundError(f'Weather file not found for {nearest_city}')
-        model.SolarResource.solar_resource_file = weather_file_path
+    model = Pvwattsv8.default('PVWattsNone')
+    model.SystemDesign.system_capacity = 1 # kw
+    model.SolarResource.solar_resource_file = os.path.join('Weather', f'{nearest_city}.epw')
+    model.execute()
+    return {
+    'ac_monthly': model.Outputs.ac_monthly,
+    'ac_annual': model.Outputs.ac_annual,
+    'capacity_factor': model.Outputs.capacity_factor,
+    'gh': model.Outputs.gh,
+    'solrad_monthly': model.Outputs.solrad_monthly,
+    'gen': model.Outputs.gen
+    }
 
-        model.execute()
-        
-        # Extract results (example)
-        print(f"AC Monthly: {model.Outputs.ac_monthly}")
-        print(f"AC Annual: {model.Outputs.ac_annual}")
-        print(f"Capacity Factor: {model.Outputs.capacity_factor}")
-        model.Outputs.ac_monthly
-        model.Outputs.monthly_energy
-        model.Outputs.ac_annual
-        model.Outputs.gen
-        model.Outputs.capacity_factor
-        model.Outputs.gh
-        model.Outputs.solrad_monthly
-
-    except Exception as e:
-        print(f"Error processing {nearest_city}: {e}")
-
-        
-    
-
-
+PV_results = []
 for (well_id, species), wdata in energy_schedule.groupby(['Well_ID', 'Tree_Species']):
     nearest_city = well_GIS_df[well_GIS_df['state_well_number']==str(well_id)]['nearest_city'].iloc[0]
     monthly_kW_demand = wdata['Total_Power_kW'].tolist()
+    results = weather_file_match(nearest_city, monthly_kW_demand)
+    PV_results.append({
+        'well_id': well_id,
+        'species': species,
+        'result': results
+    })
 
-    print(f"Processing Well ID {well_id}, Tree Species {species}, Nearest City {nearest_city}")
-    weather_file_match(nearest_city, monthly_kW_demand)
+
+print('moving on now')
 
 # %%
 ### Generate growth equations for each tree ###
@@ -302,3 +292,21 @@ def expow4_dbh(a, b, age, mse):
 
 def expow4_age(a, b, dbh, mse):
     return math.exp(a + b * dbh + (dbh**2) + (mse / 2))
+
+# #%%
+# growth_rates = []
+
+# for index, row in tree_data.iterrows():
+#     if row['Predicts component'] == 'dbh':
+#         a = row['a']
+#         b = row['b']
+#         c = row['c']
+#         d = row['d']
+#         for age in range(20, 41):  # From age 20 to 40 inclusive
+#             dbh = quad(a, b, c, d, age)
+#             growth_rates.append({
+#                 'tree_id': row['tree_id'],  # Assuming 'tree_id' is a column in tree_data
+#                 'age': age,
+#                 'dbh': dbh
+#             })
+# # %%
